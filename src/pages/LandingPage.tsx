@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { Logo } from "../assets/Logo"
 import { ReactLogo } from "../assets/ReactLogo"
 import * as codeMockup from "../assets/code.png"
+import toast, { Toaster } from "react-hot-toast"
 import {
   useCreateSubscriberMutation,
   usePublishSubscriberMutation,
@@ -18,22 +19,38 @@ export function LandingPage() {
 
   const [publishSubscriber] = usePublishSubscriberMutation()
 
+  const successNotification = () =>
+    toast.custom(() => (
+      <div className="w-[300px] h-[120px] p-5 mt-5 rounded bg-primary-green-regular text-white text-2xl font-bold">
+        Parabéns! Você foi inscrito com successo!
+      </div>
+    ))
+
+  const errorNotification = () =>
+    toast.custom((err) => (
+      <div className="w-[300px] h-[120px] p-5 mt-5 rounded-sm bg-primary-redError text-white text-2xl font-bold uppercase">
+        Infelizmente ocorreu algum erro de inscrição.
+      </div>
+    ))
+
+  const notify = (msg: string) => toast(msg)
+
   async function handleSubscribe(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    console.log("Subscribing...")
-    await createSubscriber({ variables: { name, email } })
-    if (error) {
-      console.error(error)
-    }
-    console.log("Subscribed!")
+    try {
+      const result = await createSubscriber({ variables: { name, email } })
 
-    if (data?.createSubscriber?.id) {
-      await publishSubscriber({ variables: { id: data.createSubscriber.id } })
-      console.log("Published!")
+      if (result.data?.createSubscriber) {
+        await publishSubscriber({
+          variables: { id: result.data.createSubscriber.id },
+        })
+        successNotification()
+        setTimeout(() => navigate("/event"), 2000)
+      }
+    } catch (error) {
+      errorNotification()
     }
-
-    navigate("/event")
   }
 
   return (
@@ -90,6 +107,7 @@ export function LandingPage() {
       </div>
 
       <img src={codeMockup.default} alt="Code Mockup" className="mt-10" />
+      <Toaster />
     </div>
   )
 }
