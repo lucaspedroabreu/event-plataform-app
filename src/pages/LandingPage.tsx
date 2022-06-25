@@ -1,8 +1,8 @@
-import { gql, useMutation } from "@apollo/client"
 import { FormEvent, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Logo } from "../assets/Logo"
 import { ReactLogo } from "../assets/ReactLogo"
+import * as codeMockup from "../assets/code.png"
 import {
   useCreateSubscriberMutation,
   usePublishSubscriberMutation,
@@ -89,7 +89,7 @@ export function LandingPage() {
         </div>
       </div>
 
-      <img src="/src/assets/code.png" alt="Code Mockup" className="mt-10" />
+      <img src={codeMockup.default} alt="Code Mockup" className="mt-10" />
     </div>
   )
 }
